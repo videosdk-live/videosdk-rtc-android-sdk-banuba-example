@@ -22,20 +22,21 @@ https://github.com/videosdk-live/videosdk-rtc-android-sdk-banuba-example.git
 Get the latest Banuba SDK archive for Android and the client token. Please fill form on [form on banuba.com](https://www.banuba.com/face-filters-sdk).
 
 ### Step 3: Add Banuba SDK dependencies
-Copy `aar` files from the Banuba SDK archive into `libs` dir:
-   `banuba_sdk-release.aar` => ['libs/'](../../tree/master/app/src/main/libs)
-   `banuba_effect_player-release.aar` => [`libs/`](../../tree/master/app/src/main/libs)
-
+Copy `aar` files from the Banuba SDK archive into `libs` directory.
+   
 ### Step 4: Modify Banuba Token
-Copy and Paste your client token to `KEY` variable of [`app/src/main/java/banuba/BanubaProcessor.java`](../../tree/master/app/src/main/java/com/banuba/BanubaProcessor.java)
+Copy and Paste your client token to `KEY` variable of [`app/src/main/java/banuba/BanubaProcessor.java`](../../tree/main/app/src/main/java/com/banuba/BanubaProcessor.java)
 
-### Step 5: Modify local.properties
+### Step 5: Add Effects
+Add effects that you want to use in the `effects` folder.You can download test effects here: [Effects](https://docs.banuba.com/face-ar-sdk-v1/overview/demo_face_filters)
+
+### Step 6: Modify local.properties
 Generate temporary token from [Video SDK Account](https://app.videosdk.live/signup).
 ```js title="local.properties"
 auth_token= "TEMPORARY-TOKEN"
 ```
 
-### Step 6: Run the sample app
+### Step 7: Run the sample app
 Run the android app with **Shift+F10** or the ** ▶ Run ** from toolbar. 
 
 ## Examples
