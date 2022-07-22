@@ -1,0 +1,561 @@
+{
+  "assets": {
+    "attachments": {
+      "ComposerRT_color": {
+        "type": "color"
+      },
+      "EffectRT0_color": {
+        "type": "color"
+      },
+      "EffectRT0_depth": {
+        "clear": [
+          1.0
+        ],
+        "type": "depth"
+      },
+      "backgroundSeparationRT_color": {
+        "type": "color"
+      },
+      "finalColorFilterRT_color": {
+        "type": "color"
+      }
+    },
+    "faces": {
+      "face0": {
+        "index": 0,
+        "mesh": "!glfx_FACE"
+      }
+    },
+    "images": {
+      "50s_256x512.png": {
+        "file_name": "images/50s_256x512.png",
+        "type": "texture"
+      },
+      "EYES_high.png": {
+        "file_name": "images/EYES_high.png",
+        "type": "texture"
+      },
+      "FLARE_37_768.png": {
+        "file_name": "images/FLARE_37_768.png",
+        "type": "texture"
+      },
+      "LUT_sunny.png": {
+        "file_name": "images/LUT_sunny.png",
+        "type": "texture"
+      },
+      "PineappleGlasses_Base_Color.ktx": {
+        "file_name": "images/PineappleGlasses_Base_Color.ktx",
+        "type": "texture"
+      },
+      "PineappleGlasses_MRAO.ktx": {
+        "file_name": "images/PineappleGlasses_MRAO.ktx",
+        "type": "texture"
+      },
+      "PineappleGlasses_Normal.ktx": {
+        "file_name": "images/PineappleGlasses_Normal.ktx",
+        "type": "texture"
+      },
+      "REDMASK_v3_256.png": {
+        "file_name": "images/REDMASK_v3_256.png",
+        "type": "texture"
+      },
+      "TEETH_high.png": {
+        "file_name": "images/TEETH_high.png",
+        "type": "texture"
+      },
+      "background": {
+        "active": true,
+        "recognizer_feature_name": "background",
+        "type": "segmentation_mask"
+      },
+      "brdf.ktx": {
+        "file_name": "images/brdf.ktx",
+        "type": "texture"
+      },
+      "camera": {
+        "type": "procedural_texture",
+        "algorithm": "camera_composer"
+      },
+      "hair": {
+        "active": false,
+        "recognizer_feature_name": "hair",
+        "type": "segmentation_mask"
+      },
+      "ibl_diff.ktx": {
+        "file_name": "images/ibl_diff.ktx",
+        "type": "cubemap"
+      },
+      "ibl_spec.ktx": {
+        "file_name": "images/ibl_spec.ktx",
+        "type": "cubemap"
+      },
+      "left_eye": {
+        "active": false,
+        "recognizer_feature_name": "left_eye",
+        "type": "segmentation_mask"
+      },
+      "lips": {
+        "active": false,
+        "recognizer_feature_name": "lips",
+        "type": "segmentation_mask"
+      },
+      "null_image.png": {
+        "file_name": "images/null_image.png",
+        "type": "texture"
+      },
+      "null_lut.png": {
+        "file_name": "images/null_lut.png",
+        "type": "texture"
+      },
+      "preview.png": {
+        "file_name": "images/preview.png",
+        "type": "texture"
+      },
+      "right_eye": {
+        "active": false,
+        "recognizer_feature_name": "right_eye",
+        "type": "segmentation_mask"
+      },
+      "skin": {
+        "active": false,
+        "recognizer_feature_name": "skin",
+        "type": "segmentation_mask"
+      },
+      "soft_dark_eyes_256.png": {
+        "file_name": "images/soft_dark_eyes_256.png",
+        "type": "texture"
+      }
+    },
+    "materials": {
+      "$builtin$materials/copy_pixels.0": {
+        "parameters": {},
+        "samplers": [
+          {
+            "image": "backgroundSeparationRT_color",
+            "name": "tex_src"
+          }
+        ],
+        "state": {
+          "backfaces": true,
+          "blend": "off",
+          "colorwrite": true,
+          "ztest": false,
+          "zwrite": false
+        }
+      },
+      "$builtin$materials/copy_pixels.1": {
+        "parameters": {},
+        "samplers": [
+          {
+            "image": "camera",
+            "name": "tex_src"
+          }
+        ],
+        "state": {
+          "backfaces": true,
+          "blend": "off",
+          "colorwrite": true,
+          "ztest": false,
+          "zwrite": false
+        }
+      },
+      "shaders/PineappleGlasses": {
+        "built_in_samplers": [
+          "bnb_BONES",
+          "bnb_UVMORPH",
+          "bnb_STATICPOS",
+          "bnb_MORPH"
+        ],
+        "samplers": [
+          {
+            "image": "PineappleGlasses_Base_Color.ktx",
+            "name": "tex_diffuse"
+          },
+          {
+            "image": "PineappleGlasses_Normal.ktx",
+            "name": "tex_normal"
+          },
+          {
+            "image": "brdf.ktx",
+            "name": "tex_brdf"
+          },
+          {
+            "image": "ibl_diff.ktx",
+            "name": "tex_ibl_diff"
+          },
+          {
+            "image": "ibl_spec.ktx",
+            "name": "tex_ibl_spec"
+          },
+          {
+            "image": "PineappleGlasses_MRAO.ktx",
+            "name": "tex_mrao"
+          },
+          {
+            "name": "bnb_BONES"
+          },
+          {
+            "name": "bnb_UVMORPH"
+          },
+          {
+            "name": "bnb_STATICPOS"
+          },
+          {
+            "name": "bnb_MORPH"
+          }
+        ],
+        "state": {
+          "backfaces": false,
+          "blend": "alpha",
+          "colorwrite": true,
+          "ztest": true,
+          "zwrite": true
+        }
+      },
+      "shaders/backgroundSeparation": {
+        "samplers": [
+          {
+            "image": "backgroundSeparation",
+            "name": "tex_src"
+          },
+          {
+            "image": "background",
+            "name": "s_segmentation_mask"
+          },
+          {
+            "image": "camera",
+            "name": "s_bg_texture"
+          }
+        ],
+        "state": {
+          "backfaces": true,
+          "blend": "add",
+          "colorwrite": true,
+          "ztest": false,
+          "zwrite": false
+        }
+      },
+      "shaders/finalColorFilter.fsh": {
+        "samplers": [
+          {
+            "image": "EffectRT0_color",
+            "name": "s_src"
+          },
+          {
+            "image": "LUT_sunny.png",
+            "name": "lookupTexture"
+          }
+        ],
+        "state": {
+          "backfaces": true,
+          "blend": "off",
+          "colorwrite": true,
+          "ztest": false,
+          "zwrite": false
+        }
+      },
+      "shaders/glass": {
+        "built_in_samplers": [
+          "bnb_BONES",
+          "bnb_UVMORPH",
+          "bnb_STATICPOS",
+          "bnb_MORPH"
+        ],
+        "samplers": [
+          {
+            "image": "PineappleGlasses_Base_Color.ktx",
+            "name": "tex_diffuse"
+          },
+          {
+            "image": "PineappleGlasses_Normal.ktx",
+            "name": "tex_normal"
+          },
+          {
+            "image": "brdf.ktx",
+            "name": "tex_brdf"
+          },
+          {
+            "image": "ibl_diff.ktx",
+            "name": "tex_ibl_diff"
+          },
+          {
+            "image": "ibl_spec.ktx",
+            "name": "tex_ibl_spec"
+          },
+          {
+            "image": "PineappleGlasses_MRAO.ktx",
+            "name": "tex_mrao"
+          },
+          {
+            "name": "bnb_BONES"
+          },
+          {
+            "name": "bnb_UVMORPH"
+          },
+          {
+            "name": "bnb_STATICPOS"
+          },
+          {
+            "name": "bnb_MORPH"
+          }
+        ],
+        "state": {
+          "backfaces": false,
+          "blend": "alpha",
+          "colorwrite": true,
+          "ztest": true,
+          "zwrite": true
+        }
+      },
+      "shaders/retouch": {
+        "built_in_samplers": [],
+        "samplers": [
+          {
+            "image": "REDMASK_v3_256.png",
+            "name": "selection_tex"
+          },
+          {
+            "image": "TEETH_high.png",
+            "name": "lookupTexTeeth"
+          },
+          {
+            "image": "EYES_high.png",
+            "name": "lookupTexEyes"
+          },
+          {
+            "image": "soft_dark_eyes_256.png",
+            "name": "tex_softLight"
+          },
+          {
+            "image": "50s_256x512.png",
+            "name": "tex_normalMakeup"
+          },
+          {
+            "image": "FLARE_37_768.png",
+            "name": "tex_highlight"
+          },
+          {
+            "image": "camera",
+            "name": "glfx_BACKGROUND"
+          }
+        ],
+        "state": {
+          "backfaces": false,
+          "blend": "off",
+          "colorwrite": true,
+          "ztest": true,
+          "zwrite": true
+        }
+      }
+    },
+    "media": {
+      "backgroundSeparation": {
+        "file_name": "videos/Back_F.mp4",
+        "looped": false,
+        "play": false,
+        "type": "video"
+      },
+      "music.ogg": {
+        "file_name": "audios/music.ogg",
+        "type": "audio"
+      }
+    },
+    "meshes": {
+      "!glfx_FACE": "$builtin$meshes/face.stream:0",
+      "PineappleGlasses.bsm2": "meshes/PineappleGlasses.bsm2",
+      "camera_surface": "$builtin$meshes/fs_tri",
+      "morth.bsm2": "meshes/morth.bsm2"
+    },
+    "morphs": {
+      "morph0": {
+        "mesh": "morth.bsm2",
+        "type": "mesh"
+      }
+    }
+  },
+  "components": {
+    "ComposerRT_copy": {
+      "materials": [
+        "$builtin$materials/copy_pixels.0"
+      ],
+      "mesh": "camera_surface",
+      "type": "mesh_instance"
+    },
+    "bg_separation_copy__": {
+      "materials": [
+        "$builtin$materials/copy_pixels.1"
+      ],
+      "mesh": "camera_surface",
+      "type": "mesh_instance"
+    },
+    "face_tracker:0": {
+      "face": "face0",
+      "type": "face_tracker"
+    },
+    "finalColorFilter": {
+      "materials": [
+        "shaders/finalColorFilter.fsh"
+      ],
+      "mesh": "camera_surface",
+      "type": "mesh_instance"
+    },
+    "glfx_layer_backgroundSeparation": {
+      "materials": [
+        "shaders/backgroundSeparation"
+      ],
+      "mesh": "camera_surface",
+      "type": "mesh_instance"
+    },
+    "internal_morph__": {
+      "morph": "morph0",
+      "type": "face_morphing"
+    }
+  },
+  "entities": {
+    "ComposerRT_copy_append_to_root__": {
+      "components": [
+        "ComposerRT_copy"
+      ],
+      "layer": "ComposerRT_copy"
+    },
+    "bg_separation_copy_append_to_root__": {
+      "components": "bg_separation_copy__",
+      "layer": "bg_separation_copy__"
+    },
+    "face_tracker0": {
+      "components": [
+        "face_tracker:0"
+      ]
+    },
+    "finalColorFilter_append_to_root__": {
+      "components": "finalColorFilter",
+      "layer": "finalColorFilter"
+    },
+    "glfx_layer_backgroundSeparation": {
+      "components": [
+        "glfx_layer_backgroundSeparation"
+      ],
+      "layer": "glfx_layer_backgroundSeparation"
+    },
+    "internal_morph": {
+      "components": [
+        "internal_morph__"
+      ],
+      "layer": "internal_face_morph__"
+    },
+    "spawn_entity0": {
+      "add_to_legacy_entities_list": true,
+      "layers": [
+        "retouch",
+        "glass",
+        "PineappleGlasses"
+      ]
+    },
+    "spawn_entity1": {
+      "add_to_legacy_entities_list": true,
+      "layers": [
+        "retouch",
+        "glass",
+        "PineappleGlasses"
+      ]
+    },
+    "spawn_entity2": {
+      "add_to_legacy_entities_list": true,
+      "layers": [
+        "retouch",
+        "glass",
+        "PineappleGlasses"
+      ]
+    }
+  },
+  "hierarchy": {
+    "face_tracker0": [
+      "internal_morph",
+      "spawn_entity0",
+      "spawn_entity1",
+      "spawn_entity2"
+    ],
+    "root": [
+      "face_tracker0",
+      "ComposerRT_copy_append_to_root__",
+      "finalColorFilter_append_to_root__",
+      "glfx_layer_backgroundSeparation",
+      "bg_separation_copy_append_to_root__"
+    ]
+  },
+  "layers": {
+    "ComposerRT_copy": {},
+    "PineappleGlasses": {},
+    "bg_separation_copy__": {},
+    "finalColorFilter": {},
+    "glass": {},
+    "glfx_layer_backgroundSeparation": {},
+    "internal_face_morph__": {},
+    "retouch": {}
+  },
+  "render_list": {
+    "default": [
+      {
+        "layer": "bg_separation_copy__",
+        "render_target": "backgroundSeparationRT"
+      },
+      {
+        "layer": "glfx_layer_backgroundSeparation",
+        "render_target": "backgroundSeparationRT"
+      },
+      {
+        "layer": "ComposerRT_copy",
+        "render_target": "EffectRT0"
+      },
+      {
+        "layer": "retouch",
+        "render_target": "EffectRT0",
+        "sub_geometries": [
+          "retouch"
+        ]
+      },
+      {
+        "layer": "internal_face_morph__",
+        "render_target": "EffectRT0"
+      },
+      {
+        "layer": "glass",
+        "render_target": "EffectRT0",
+        "sub_geometries": [
+          "glass"
+        ]
+      },
+      {
+        "layer": "PineappleGlasses",
+        "render_target": "EffectRT0",
+        "sub_geometries": [
+          "PineappleGlasses"
+        ]
+      },
+      {
+        "layer": "finalColorFilter",
+        "render_target": "finalColorFilterRT"
+      }
+    ]
+  },
+  "render_targets": {
+    "ComposerRT": [
+      "ComposerRT_color"
+    ],
+    "EffectRT0": [
+      "EffectRT0_color",
+      "EffectRT0_depth"
+    ],
+    "backgroundSeparationRT": [
+      "backgroundSeparationRT_color"
+    ],
+    "finalColorFilterRT": [
+      "finalColorFilterRT_color"
+    ]
+  },
+  "scene": "PineappleGlasses",
+  "script": {
+    "entry_point": "config.js",
+    "type": "legacy"
+  }
+}
