@@ -15,7 +15,7 @@ Quick start example to integrate Banuba SDK with videosdk.live using Android SDK
 ### Step 1: Clone the sample project
 Clone the repository to your local environment.
 ```js
-https://github.com/videosdk-live/videosdk-rtc-android-sdk-banuba-example.git
+git clone https://github.com/videosdk-live/videosdk-rtc-android-sdk-banuba-example.git
 ```
 
 ### Step 2: Banuba Token
