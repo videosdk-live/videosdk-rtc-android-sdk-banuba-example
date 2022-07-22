@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="@color/md_grey_700"
+    tools:layout_height="200dp">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#99000000"
+        android:contentDescription="@string/webcam_turned_off"
+        android:gravity="center"
+        android:padding="4dp"
+        android:src="@drawable/ic_outline_videocam_off_24"
+        app:tint="@color/white" />
+
+
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/svrParticipant"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#99000000"
+        android:gravity="center"
+        android:padding="4dp"
+        android:textColor="@color/white" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:contentDescription="@string/more_options"
+        android:src="@drawable/ic_baseline_more_vert_24"
+        app:elevation="2dp"
+        app:fabSize="mini" />
+
+</FrameLayout>
