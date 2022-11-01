@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
         Map<String, CustomStreamTrack> customTracks = new HashMap<>();
 
-        CustomStreamTrack videoCustomTrack = VideoSDK.createCameraVideoTrack("h720p_w1280p", "front", this,observer);
+        CustomStreamTrack videoCustomTrack = VideoSDK.createCameraVideoTrack("h720p_w1280p", "front", CustomStreamTrack.VideoMode.MOTION,this,observer);
         customTracks.put("video", videoCustomTrack);
 
         CustomStreamTrack audioCustomTrack = VideoSDK.createAudioTrack("high_quality", null, this);
@@ -509,7 +509,7 @@ public class MainActivity extends AppCompatActivity {
             if (webcamEnabled) {
                 meeting.disableWebcam();
             } else {
-                CustomStreamTrack videoCustomTrack = VideoSDK.createCameraVideoTrack("h720p_w1280p", "front", this, observer);
+                CustomStreamTrack videoCustomTrack = VideoSDK.createCameraVideoTrack("h720p_w1280p", "front", CustomStreamTrack.VideoMode.MOTION,this, observer);
 
                 initVideoFrameProcessor(videoCustomTrack.getVideoSource(), videoCustomTrack);
 
