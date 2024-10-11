@@ -75,7 +75,10 @@ public class EffectsAdapter extends RecyclerView.Adapter<EffectsAdapter.EffectIn
         EffectInfoViewHolder(View itemView) {
             super(itemView);
             mImageView = itemView.findViewById(R.id.iconView);
+            mImageView.setVisibility(View.GONE);
             txtEffectName = itemView.findViewById(R.id.txtEffectName);
+            txtEffectName.setPadding(15,15,15,15);
+
         }
     }
 }

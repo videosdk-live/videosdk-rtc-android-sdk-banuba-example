@@ -19,11 +19,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 
-import org.webrtc.Camera1Enumerator;
+import org.webrtc.Camera2Capturer;
+import org.webrtc.Camera2Enumerator;
+import org.webrtc.CameraEnumerator;
+import org.webrtc.CapturerObserver;
+import org.webrtc.EglBase;
+import org.webrtc.EglRenderer;
+import org.webrtc.GlRectDrawer;
+import org.webrtc.JavaI420Buffer;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.SurfaceViewRenderer;
+import org.webrtc.ThreadUtils;
 import org.webrtc.VideoCapturer;
+import org.webrtc.VideoFrame;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
@@ -220,7 +229,7 @@ public class JoinActivity extends AppCompatActivity {
 
 
     private VideoCapturer createCameraCapturer() {
-        Camera1Enumerator enumerator = new Camera1Enumerator(false);
+        Camera2Enumerator enumerator = new Camera2Enumerator(this);
         final String[] deviceNames = enumerator.getDeviceNames();
 
         // First, try to find front facing camera

@@ -1,228 +1,116 @@
 package live.videosdk.rtc.android.java.banuba;
-
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.graphics.ImageFormat;
 import android.os.Handler;
-import android.provider.Settings;
-import android.util.Log;
 import android.util.Size;
-
-import androidx.annotation.NonNull;
-
-import com.banuba.sdk.effect_player.ConsistencyMode;
-import com.banuba.sdk.effect_player.EffectPlayer;
-import com.banuba.sdk.effect_player.EffectPlayerConfiguration;
-import com.banuba.sdk.effect_player.NnMode;
-import com.banuba.sdk.internal.utils.OrientationHelper;
-import com.banuba.sdk.manager.BanubaSdkManager;
-import com.banuba.sdk.offscreen.BufferAllocator;
-import com.banuba.sdk.offscreen.ImageDebugUtils;
-import com.banuba.sdk.offscreen.ImageProcessResult;
-import com.banuba.sdk.offscreen.OffscreenEffectPlayer;
-import com.banuba.sdk.offscreen.OffscreenSimpleConfig;
-import com.banuba.sdk.recognizer.FaceSearchMode;
+import com.banuba.sdk.effect_player.CameraOrientation;
+import com.banuba.sdk.frame.FramePixelBufferFormat;
+import com.banuba.sdk.input.StreamInput;
+import com.banuba.sdk.output.FrameOutput;
+import com.banuba.sdk.player.Player;
+import com.banuba.sdk.types.FrameData;
 import com.banuba.sdk.types.FullImageData;
-
+import org.webrtc.EglBase;
 import org.webrtc.JavaI420Buffer;
-import org.webrtc.JniCommon;
+import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoFrame;
-import org.webrtc.VideoSink;
-
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Queue;
+import live.videosdk.rtc.android.listeners.VideoFrameProcessor;
 
-public class BanubaProcessor implements IVideoFrameProcessor {
-    //    private OffscreenEffectPlayerConfig mEffectPlayerConfig;
-    private OffscreenEffectPlayer mEffectPlayer;
-    private VideoSink mVideoSink;
-    private boolean mProcessorEnabled = false;
-    private Handler mHandler;
-    private final BuffersQueue mBuffersQueue = new BuffersQueue();
-    public static final String KEY = "place_your_token_here";
-    private static final int framesDivider = 50;
-    private Context mContext;
-    private int mFrameNumber = 0;
-    private int mLastFrameRotation = 0;
-    final private boolean debugSaveFrames = false;
+public class BanubaProcessor implements VideoFrameProcessor {
+    private Player mPlayer;
+    private FrameOutput mFrameOutput;
+    private final EglBase.Context eglContext = EglBase.create().getEglBaseContext();
+    private SurfaceTextureHelper mSurfaceTextureHelper;
+    VideoFrame videoFrame;
+    final StreamInput streamInput = new StreamInput();
 
-    @Override
-    public void onCaptureCreate(Context context, Handler handler, int width, int height) {
-        // Uncomment if external resources` archive is used.
-        //BanubaSdkManager.initialize(context, KEY, context.getFilesDir().toString() + "/banuba/bnb-resources/bnb-resources");
-        this.mContext = context;
-        this.mHandler = handler;
-
-        BanubaSdkManager.initialize(context, KEY);
-        EffectPlayerConfiguration effectPlayerConfig = new EffectPlayerConfiguration(width, height, NnMode.ENABLE, FaceSearchMode.MEDIUM, false, false);
-        EffectPlayer effectPlayer = Objects.requireNonNull(EffectPlayer.create(effectPlayerConfig));
-        effectPlayer.setRenderConsistencyMode(ConsistencyMode.ASYNCHRONOUS_CONSISTENT);
-
-        OffscreenSimpleConfig oepConfig = OffscreenSimpleConfig.newBuilder(mBuffersQueue).build();
-        mEffectPlayer = new OffscreenEffectPlayer(context, effectPlayer, new Size(width, height), oepConfig);
-
-/*
-        mEffectPlayerConfig = OffscreenEffectPlayerConfig.newBuilder(new Size(width, height), mBuffersQueue)
-            .setDebugSaveFrames(debugSaveFrames).setDebugSaveFramesDivider(framesDivider)
-            .setFaceSearchMode(FaceSearchMode.MEDIUM)
-            .build();
-        mEffectPlayer = new OffscreenEffectPlayer(context, mEffectPlayerConfig, KEY);
- */
-
-
-        mEffectPlayer.setImageProcessListener(oepImageResult -> {
-            if (mVideoSink != null && oepImageResult.getOrientation().getRotationAngle() == mLastFrameRotation) {
-                VideoFrame videoFrame = convertOEPImageResult2VideoFrame(oepImageResult);
-                mVideoSink.onFrame(videoFrame);
-            }
-        }, mHandler);
+    public BanubaProcessor (){
+        mSurfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eglContext, false);
+        mPlayer = new Player();
     }
 
-    @Override
-    public void onCaptureStarted() {
+    // Method to set a visual effect in the Banuba Player
+    public void setEffect(String effect)
+    {
+        mPlayer.loadAsync("effects/" + effect);
+        mPlayer.play();
     }
 
-    @Override
-    public void onCaptureStopped() {
+    // Method to remove any applied effects
+    public void removeEffect()
+    {
+        mPlayer.loadAsync("" );
     }
 
-    @Override
-    public void onCaptureDestroy() {
-        mEffectPlayer.release();
+    // Method to close the player when it's no longer needed
+    public void removePlayer()
+    {
+        mPlayer.close();
     }
 
-    @Override
-    public void pushVideoFrame(VideoFrame videoFrame, boolean isFrontCamera) {
-        mLastFrameRotation = videoFrame.getRotation();
+    // Method to initialize the frame output for video processing
+    private VideoFrame initOutput() {
+        final Handler handler = mSurfaceTextureHelper.getHandler();
+        mFrameOutput = new FrameOutput((iOutput, framePixelBuffer) -> {
+            handler.post(() -> {
 
-        if (!mProcessorEnabled) {
-            VideoFrame newVideoFrame = new VideoFrame(videoFrame.getBuffer().toI420(), videoFrame.getRotation(), videoFrame.getTimestampNs());
-            mVideoSink.onFrame(newVideoFrame);
-            newVideoFrame.release();
-            return;
-        }
-        VideoFrame.I420Buffer i420Buffer = videoFrame.getBuffer().toI420();
-        int width = i420Buffer.getWidth();
-        int height = i420Buffer.getHeight();
-
-        if (debugSaveFrames && mFrameNumber % framesDivider == 0) {
-            ImageDebugUtils.saveImageDetailed(mContext, ImageFormat.YUV_420_888,
-                    i420Buffer.getDataY(),
-                    i420Buffer.getWidth(),
-                    i420Buffer.getHeight(),
-                    i420Buffer.getStrideY(), "camera.jpg", mFrameNumber, null);
-        }
-        mFrameNumber++;
-
-        final boolean isRequireMirroring = isFrontCamera;
-        @SuppressLint("RestrictedApi") int deviceOrientationAngle = OrientationHelper.getInstance(mContext).getDeviceOrientationAngle();
-        if (!isFrontCamera) {
-            if (deviceOrientationAngle == 0) {
-                deviceOrientationAngle = 180;
-            } else if (deviceOrientationAngle == 180) {
-                deviceOrientationAngle = 0;
-            }
-        }
-
-        @SuppressLint("RestrictedApi") final FullImageData.Orientation orientation = OrientationHelper.getOrientation(
-                videoFrame.getRotation(),
-                deviceOrientationAngle,
-                isRequireMirroring);
-
-        Log.d("videoFrame.getRotation", "" + videoFrame.getRotation() + "\t faceOrientation: " + orientation.getFaceOrientation() +
-                "\t deviceOrientation: " + deviceOrientationAngle +
-                "\t rw: " + videoFrame.getRotatedWidth() + "\t rh: " + videoFrame.getRotatedHeight());
-
-        FullImageData fullImageData = new FullImageData(new Size(width, height), i420Buffer.getDataY(),
-                i420Buffer.getDataU(), i420Buffer.getDataV(), i420Buffer.getStrideY(),
-                i420Buffer.getStrideU(), i420Buffer.getStrideV(), 1, 1, 1, orientation);
-        Log.d("fullImageData", "" + fullImageData.getSize().getHeight() + " " + fullImageData.getSize().getWidth());
-
-        mEffectPlayer.processFullImageData(fullImageData, () -> mHandler.post(() -> i420Buffer.release()), videoFrame.getTimestampNs());
-    }
-
-    public VideoFrame convertOEPImageResult2VideoFrame(ImageProcessResult result) {
-
-        final int width = result.getWidth();
-        final int height = result.getHeight();
-
-        final ByteBuffer buffer = result.getBuffer();
-        mBuffersQueue.retainBuffer(buffer);
-        final ByteBuffer dataY = result.getPlaneBuffer(0);
-        final int strideY = result.getBytesPerRowOfPlane(0);
-        final ByteBuffer dataU = result.getPlaneBuffer(1);
-        final int strideU = result.getBytesPerRowOfPlane(1);
-        final ByteBuffer dataV = result.getPlaneBuffer(2);
-        final int strideV = result.getBytesPerRowOfPlane(2);
-
-        JavaI420Buffer I420buffer = JavaI420Buffer.wrap(width, height, dataY, strideY, dataU, strideU, dataV, strideV, () -> {
-            JniCommon.nativeFreeByteBuffer(buffer);
+                final JavaI420Buffer i420buffer = JavaI420Buffer.wrap(
+                        framePixelBuffer.getWidth(),
+                        framePixelBuffer.getHeight(),
+                        framePixelBuffer.getPlane(0),
+                        framePixelBuffer.getBytesPerRowOfPlane(0),
+                        framePixelBuffer.getPlane(1),
+                        framePixelBuffer.getBytesPerRowOfPlane(1),
+                        framePixelBuffer.getPlane(2),
+                        framePixelBuffer.getBytesPerRowOfPlane(2),
+                        null);
+                videoFrame = new VideoFrame(i420buffer, 0, System.nanoTime());
+            });
         });
+        mFrameOutput.setFormat(FramePixelBufferFormat.I420_BT601_FULL);
 
-        return new VideoFrame(I420buffer, result.getOrientation().getRotationAngle(), result.getTimestamp());
+        // Close the FrameOutput after a delay of 2 seconds
+        handler.postDelayed(() -> {
+            mFrameOutput.close();
+        },2000);
+
+        // Attach the FrameOutput to the player for rendering
+        mPlayer.use(mFrameOutput);
+
+        // Return the processed video frame
+        return videoFrame;
     }
 
+    // Method called when a new video frame is captured
     @Override
-    public void setSink(VideoSink videoSink) {
-        mVideoSink = videoSink;
-    }
+    public VideoFrame onFrameCaptured(VideoFrame videoFrame) {
+        if(videoFrame != null) {
+            // Determine the camera orientation based on the rotation of the video frame
+            final CameraOrientation cameraOrientation = CameraOrientation.values()[(videoFrame.getRotation() / 90) % 4];
+            final FullImageData.Orientation orientation = new FullImageData.Orientation(cameraOrientation, true, 0);
+            final VideoFrame.I420Buffer i420Buffer = videoFrame.getBuffer().toI420();
 
-    @Override
-    public void callJsMethod(String method, String param) {
-        mEffectPlayer.callJsMethod(method, param);
-    }
+            // Create FullImageData using the frame data and orientation
+            final FullImageData fullImageData = new FullImageData(
+                    new Size(i420Buffer.getWidth(), i420Buffer.getHeight()),
+                    i420Buffer.getDataY(),
+                    i420Buffer.getDataU(),
+                    i420Buffer.getDataV(),
+                    i420Buffer.getStrideY(),
+                    i420Buffer.getStrideU(),
+                    i420Buffer.getStrideV(),
+                    1, 1, 1,
+                    orientation);
+            final FrameData frameData = Objects.requireNonNull(FrameData.create());
+            frameData.addFullImg(fullImageData);
+            i420Buffer.release();
+            streamInput.push(frameData, videoFrame.getTimestampNs());
 
-    @Override
-    public void loadEffect(String effectName) {
-        mEffectPlayer.loadEffect(effectName);
-    }
+            // Attach the StreamInput to the player for further processing
+            mPlayer.use(streamInput);
 
-    @Override
-    public void unloadEffect() {
-        mEffectPlayer.unloadEffect();
-    }
-
-    @Override
-    public void setProcessorEnabled(Boolean isEnabled) {
-        mProcessorEnabled = isEnabled;
-    }
-
-    public OffscreenEffectPlayer getEffectPlayer() {
-        return mEffectPlayer;
-    }
-
-    private boolean isAndroidOrientationFixed() {
-        return Settings.System.getInt(mContext.getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 0;
-    }
-
-    private static class BuffersQueue implements BufferAllocator {
-
-        private final int capacity = 4;
-        private final Queue<ByteBuffer> queue = new LinkedList<>();
-
-
-        @NonNull
-        @Override
-        public synchronized ByteBuffer allocateBuffer(int minimumCapacity) {
-
-            final ByteBuffer buffer = queue.poll();
-            if (buffer != null && buffer.capacity() >= minimumCapacity) {
-                buffer.rewind();
-                buffer.limit(buffer.capacity());
-                return buffer;
-            }
-
-            return ByteBuffer.allocateDirect(minimumCapacity);
+            // Return the processed video frame
+            return initOutput();
         }
-
-        public synchronized void retainBuffer(@NonNull ByteBuffer buffer) {
-            if (queue.size() < capacity) {
-                queue.add(buffer);
-            }
-        }
-
+        return null;
     }
-
 }

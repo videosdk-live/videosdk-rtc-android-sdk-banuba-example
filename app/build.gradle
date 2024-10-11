@@ -1,21 +1,22 @@
 plugins {
     id 'com.android.application'
-}
+}\
 
 def localProperties = new Properties()
 localProperties.load(new FileInputStream(rootProject.file("local.properties")))
 
+String bnb_version = "1.14.+"
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "live.videosdk.rtc.android.java"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -42,21 +43,18 @@ android {
 
 dependencies {
 
-    implementation 'live.videosdk:rtc-android-sdk:0.1.7'
-
-    // Banuba SDK dependencies
-    implementation fileTree(dir: 'libs', include: ['*.aar'])
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-
+    implementation 'live.videosdk:rtc-android-sdk:0.1.35'
     implementation 'com.nabinbhandari.android:permissions:3.8'
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
 
+    implementation "com.banuba.sdk:banuba_sdk:1+"
+    
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
 }
